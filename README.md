@@ -1,0 +1,1 @@
+# stratServer.bat
