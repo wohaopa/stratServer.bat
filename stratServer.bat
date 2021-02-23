@@ -1,4 +1,4 @@
-::---------------------------------介绍 1.0.1----------------------------------
+::---------------------------------介绍 1.0.1------------------------------
 ::支持一键更改JAVA路径
 ::支持一键设置外置登录
 ::支持自动重启，支持限制重启次数
@@ -16,22 +16,23 @@ set LOGS_FILE_NAME=serverlogs.txt
 ::设置服务器启动日志名字
 set RESTART_WAIT_TIME=5
 ::设置重启等待时间，单位秒
-set MAX_RESTART=1
+set MAX_RESTART=5
 ::重启多少次后不再重启,设置成-1关闭重启，-2关闭重启限制
 set SERVER_NAME=SERVER_NAME
 ::服务器名称，会在服务端的标题处显示
-set MIN_RAM=128M
+set MIN_RAM=16384M
 ::最小内存，默认128M
-set MAX_RAM=8192M
+set MAX_RAM=27000M
 ::最大内存，默认8192M
 set SERVER_JAR_NAME=SERVER_JAR_NAME.jar
 ::设置服务端核心名称，默认路径为服务器根目录，需要写入文件后缀
 set SERVER_PATH=
 ::服务器根目录，空为当前目录，无需加""
+::set JAVA_PATH="C:\Program Files\Java\jdk1.8.0_261\bin\java.exe"
 set JAVA_PATH=java
 ::set JAVA_PATH="%JAVA_HOME%/bin/java.exe"
 ::JAVA路径，路径请保留""
-set SERVER_JAR_AFTER=
+set SERVER_JAR_AFTER=--log-strip-color
 ::服务端JAR后面的参数，Thermos建议加上--log-strip-color
 
 ::注意，在此次更改无效！请到JVM_STR中找到相应参数
@@ -54,11 +55,11 @@ set SERVER_JAR_AFTER=
 ::-XX:MaxMetaspaceSize=4096m
 ::-XX:+UseStringDeduplication
 ::-XX:hashCode=5
-set JVM_STR=-Xss512K -XX:+AggressiveOpts -XX:+UseCompressedOops -XX:+UseCMSCompactAtFullCollection -XX:+UseFastAccessorMethods -XX:ParallelGCThreads=4 -XX:+UseConcMarkSweepGC -XX:CMSFullGCsBeforeCompaction=2 -XX:CMSInitiatingOccupancyFraction=70 -XX:-DisableExplicitGC  -XX:TargetSurvivorRatio=90 -Dfile.encoding=UTF-8 
+set JVM_STR=-XX:+AggressiveOpts -XX:+UseCompressedOops -XX:+UseG1GC
 
 
 ::一下为外置登录相关
-set isauth=0
+set isauth=1
 ::设置开启外置登录，0为关闭，1为开启
 set auth_url=https://YOUR_URL/api/yggdrasil
 ::外置登录地址
@@ -115,16 +116,16 @@ echo -----------------------------------------------------------------
 ::启动时的一些显示
 
 
-if %MAX_RESTART% == -1 (title %SERVER_NAME%服务器 最大内存%MAX_RAM%M) else (title %SERVER_NAME%服务器 最大内存%MAX_RAM%M 重启次数%restart%次)
+if %MAX_RESTART% == -1 (title %SERVER_NAME%服务器 最大内存%MAX_RAM%) else (title %SERVER_NAME%服务器 最大内存%MAX_RAM% 重启次数%restart%次)
 ::设置的服务端标题，调用上面的一些变量，可酌情修改
 
 if %isauth% == 1 (goto authlib) else (goto noauthlib)
 :authlib
-%JAVA_PATH% -server -Xincgc -javaagent:%authlib_dir%\%authlib_jar%=%auth_url% -Xmx%MAX_RAM% -Xms%MIN_RAM% %JVM_STR% -jar %SERVER_JAR_NAME% %SERVER_JAR_AFTER%
+%JAVA_PATH% -server -javaagent:%authlib_dir%\%authlib_jar%=%auth_url% -Xmx%MAX_RAM% -Xms%MIN_RAM% %JVM_STR% -jar %SERVER_JAR_NAME% %SERVER_JAR_AFTER%
 goto isstop
 ::外置登录启动参数
 :noauthlib
-%JAVA_PATH% -server -Xincgc -Xmx%MAX_RAM% -Xms%MIN_RAM% %JVM_STR% -jar %SERVER_JAR_NAME% %SERVER_JAR_AFTER%
+%JAVA_PATH% -server -Xmx%MAX_RAM% -Xms%MIN_RAM% %JVM_STR% -jar %SERVER_JAR_NAME% %SERVER_JAR_AFTER%
 ::正常启动参数
 
 :isstop
